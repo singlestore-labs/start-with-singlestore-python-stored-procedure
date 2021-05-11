@@ -17,7 +17,13 @@ Usage
    
    c. **Containers**: Grab your license key from [SingleStore portal](https://msql.co/3fZoxjO) and set it into `docker-compose.yaml`. Then run `docker-compose up` to start the cluster and automatically run `init.sql`.
 
-3. Adjust the connection details in `main.py`, `pip install mariadb`, and run it.
+3. Run the example:
+
+   a. In `main.py`, adjust `host`, `port`, `user`, and `password` to match your database connection details. For example, if running from containers, `host="localhost"` is perfect. If running from Managed Service, set the host to the client endpoint from the portal.
+   
+   b. `pip install mysql-connector-python`
+   
+   c. `python main.py`
 
 
 License

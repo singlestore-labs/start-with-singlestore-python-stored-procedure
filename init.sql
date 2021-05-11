@@ -11,20 +11,22 @@ CREATE TABLE IF NOT EXISTS messages (
 DELIMITER //
 
 CREATE OR REPLACE PROCEDURE messages_create(_content varchar(300))
+RETURNS BIGINT
 AS
+  DECLARE q query(id int) = SELECT LAST_INSERT_ID() as id;
 BEGIN
-  INSERT INTO messages (
-    content
-  ) VALUES (
-    _content
-  );
-  ECHO SELECT LAST_INSERT_ID() as id;
+  INSERT INTO messages (content) VALUES (_content);
+  RETURN SCALAR(q);
 END //
 
 CREATE OR REPLACE PROCEDURE messages_read_by_id(_id bigint)
+RETURNS QUERY(id bigint, content varchar(300), createdate TIMESTAMP(6))
 AS
+DECLARE
+  q QUERY(id bigint, content varchar(300), createdate TIMESTAMP(6)) =
+  SELECT id, content, createdate FROM messages WHERE id = _id;
 BEGIN
-  ECHO SELECT id, content, createdate FROM messages WHERE id = _id;
+  RETURN q;
 END //
 
 CREATE OR REPLACE PROCEDURE messages_read_all()

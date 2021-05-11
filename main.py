@@ -1,6 +1,6 @@
 import sys
 import traceback
-import mariadb
+import mysql.connector
 
 # main is called at the bottom
 def main():
@@ -9,11 +9,11 @@ def main():
   host = 'localhost'
   port = 3306
   user = 'root'
-  password = ''
+  password = 'password_here'
   database = 'acme'
 
-  connection = mariadb.connect(user=user, password=password, database=database, host=host, port=port)
-  cursor = connection.cursor()
+  db = mysql.connector.connect(user=user, password=password, database=database, host=host, port=port)
+  cursor = db.cursor()
 
   try:
     
@@ -40,39 +40,41 @@ def main():
     traceback.print_exc(file =sys.stdout)
 
   cursor.close()
-  connection.close()
+  db.close()
 
 
 def create(cursor, content):
-  sql = "messages_create"
-  data = (content,)
-  cursor.callproc(sql, data)
+  sql = "echo messages_create(%s)"
+  data = [content]
+  cursor.execute(sql, data)
   row = cursor.fetchone()
   id = int(row[0])
   return id
 
 def read_one(cursor, id):
-  sql = "messages_read_by_id"
-  data = (id,)
-  cursor.callproc(sql, data)
+  sql = "echo messages_read_by_id(%s)"
+  data = [id]
+  cursor.execute(sql, data)
   row = cursor.fetchone()
   return row
 
 def read_all(cursor):
   sql = "messages_read_all"
   cursor.callproc(sql)
-  rows = cursor.fetchall()
+  data = cursor.stored_results()
+  for result_set in data:
+    rows = result_set.fetchall()
   return rows
 
 def update(cursor, id, content):
-  sql = "messages_update"
-  data = (id, content)
-  cursor.callproc(sql, data)
+  sql = "call messages_update(%s, %s)"
+  data = [id, content]
+  cursor.execute(sql, data)
 
 def delete(cursor, id):
-  sql = "messages_delete"
-  data = (id, )
-  cursor.callproc(sql, data)
+  sql = "call messages_delete(%s)"
+  data = [id]
+  cursor.execute(sql, data)
 
 if __name__ == '__main__':
   main()
